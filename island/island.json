@@ -1,0 +1,23 @@
+{
+  "person": {
+    "id": "ethan-hill",
+    "name": "Ethan Hill"
+  },
+  "island": {
+    "id": "yoga-with-ethan",
+    "name": "Yoga with Ethan",
+    "theme": {
+      "palette": "ember-night",
+      "fonts": {
+        "display": "Iowan Old Style",
+        "body": "Avenir Next"
+      }
+    }
+  },
+  "expressions": [
+    {
+      "id": "user-manual",
+      "path": "./user-manual/expression.json"
+    }
+  ]
+}

@@ -2,6 +2,15 @@
   "slug": "gravity-yoga",
   "title": "Gravity Yoga",
   "description": "A slower descent into fascia, long holds, and planetary spaciousness. This module frames mobility as surrender rather than force.",
+  "status": "locked",
+  "level": "Series",
+  "entryPage": "intro",
+  "presentation": {
+    "libraryLabel": "gravity yoga",
+    "libraryMark": "gravity\nyoga",
+    "detailIcon": "moon",
+    "detailTitle": "gravity\nyoga"
+  },
   "pages": [
     {
       "slug": "intro",

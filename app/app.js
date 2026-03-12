@@ -1,32 +1,17 @@
-const scenePresets = {
-  default: {
-    glowA: "rgba(129, 181, 255, 0.22)",
-    glowB: "rgba(255, 205, 146, 0.18)",
-    glowC: "rgba(92, 124, 250, 0.16)",
-    overlay:
-      "linear-gradient(120deg, rgba(255,255,255,0.06) 0%, transparent 35%, rgba(255,255,255,0.04) 100%)",
-  },
-  cosmic: {
-    glowA: "rgba(143, 120, 255, 0.28)",
-    glowB: "rgba(78, 220, 255, 0.18)",
-    glowC: "rgba(255, 194, 120, 0.16)",
-    overlay:
-      "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18) 0 1px, transparent 2px), radial-gradient(circle at 72% 30%, rgba(255,255,255,0.14) 0 1px, transparent 2px), radial-gradient(circle at 50% 80%, rgba(255,255,255,0.1) 0 1px, transparent 2px)",
-  },
-  ocean: {
-    glowA: "rgba(255, 155, 120, 0.26)",
-    glowB: "rgba(79, 163, 255, 0.18)",
-    glowC: "rgba(255, 226, 173, 0.14)",
-    overlay:
-      "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 20%, rgba(255,255,255,0.04) 48%, transparent 80%)",
-  },
-  clouds: {
-    glowA: "rgba(255, 247, 220, 0.28)",
-    glowB: "rgba(171, 206, 255, 0.18)",
-    glowC: "rgba(255, 215, 143, 0.15)",
-    overlay:
-      "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 20%), radial-gradient(circle at 65% 25%, rgba(255,255,255,0.16), transparent 18%), radial-gradient(circle at 50% 65%, rgba(255,255,255,0.12), transparent 24%)",
-  },
+const ICONS = {
+  briefcase: "◼",
+  calendar: "◷",
+  map: "⌘",
+  spark: "✦",
+  cloud: "☁",
+  sun: "☼",
+  moon: "◐",
+};
+
+const state = {
+  manifest: null,
+  modules: null,
+  pages: new Map(),
 };
 
 async function loadJson(path) {
@@ -45,38 +30,8 @@ async function loadText(path) {
   return response.text();
 }
 
-async function loadIslandData() {
-  const manifest = await loadJson("../island/content/island.json");
-  const moduleSlug = manifest.expression.modules[0];
-  const basePath = `../island/content/expressions/${manifest.expression.id}/modules/${moduleSlug}`;
-  const [module, scene] = await Promise.all([
-    loadJson(`${basePath}/module.json`),
-    loadJson(`${basePath}/scene.json`),
-  ]);
-  const pageSlug = module.pages[0].slug;
-  const page = await loadJson(`${basePath}/pages/${pageSlug}.json`);
-  const blocks = await Promise.all(
-    page.blocks.map(async (block) => {
-      if (block.type === "richText" && block.source?.markdown) {
-        return {
-          ...block,
-          markdown: await loadText(`${basePath}/${block.source.markdown}`),
-        };
-      }
-      return block;
-    }),
-  );
-
-  return {
-    manifest,
-    module,
-    page: { ...page, blocks },
-    scene,
-  };
-}
-
 function escapeHtml(text) {
-  return text
+  return String(text)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
@@ -95,7 +50,6 @@ function markdownToHtml(markdown) {
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
-
     if (!line) {
       if (inList) {
         html.push("</ul>");
@@ -103,7 +57,6 @@ function markdownToHtml(markdown) {
       }
       continue;
     }
-
     if (line.startsWith("## ")) {
       if (inList) {
         html.push("</ul>");
@@ -112,7 +65,6 @@ function markdownToHtml(markdown) {
       html.push(`<h2>${inlineMarkdown(line.slice(3))}</h2>`);
       continue;
     }
-
     if (line.startsWith("- ")) {
       if (!inList) {
         html.push("<ul>");
@@ -121,26 +73,227 @@ function markdownToHtml(markdown) {
       html.push(`<li>${inlineMarkdown(line.slice(2))}</li>`);
       continue;
     }
-
     if (inList) {
       html.push("</ul>");
       inList = false;
     }
     html.push(`<p>${inlineMarkdown(line)}</p>`);
   }
-
   if (inList) {
     html.push("</ul>");
   }
-
   return html.join("");
+}
+
+async function loadManifest() {
+  if (!state.manifest) {
+    const island = await loadJson("../island/island.json");
+    const primaryExpression = island.expressions[0];
+    const expression = await loadJson(`../island/${primaryExpression.path.replace(/^\.\//, "")}`);
+    state.manifest = { island, expression, expressionRef: primaryExpression };
+  }
+  return state.manifest;
+}
+
+async function loadModules() {
+  if (state.modules) {
+    return state.modules;
+  }
+
+  const manifest = await loadManifest();
+  const expressionRoot = manifest.expressionRef.path.replace(/^\.\//, "").replace(/\/expression\.json$/, "");
+  const modules = await Promise.all(
+    manifest.expression.modules.map(async (slug) => {
+      const basePath = `../island/${expressionRoot}/${slug}`;
+      const [module, scene] = await Promise.all([
+        loadJson(`${basePath}/module.json`),
+        loadJson(`${basePath}/scene.json`),
+      ]);
+      return { ...module, scene, basePath };
+    }),
+  );
+
+  state.modules = modules;
+  return modules;
+}
+
+async function loadPage(module, pageSlug) {
+  const key = `${module.slug}:${pageSlug}`;
+  if (state.pages.has(key)) {
+    return state.pages.get(key);
+  }
+
+  const page = await loadJson(`${module.basePath}/${pageSlug}.json`);
+  const blocks = await Promise.all(
+    page.blocks.map(async (block) => {
+      if (block.type === "richText" && block.source?.markdown) {
+        return {
+          ...block,
+          markdown: await loadText(`${module.basePath}/${block.source.markdown}`),
+        };
+      }
+      return block;
+    }),
+  );
+
+  const resolved = { ...page, blocks };
+  state.pages.set(key, resolved);
+  return resolved;
+}
+
+function getSceneVars(scene) {
+  const palette = scene.palette || {};
+  return {
+    "--page-bg": palette.background || "#ececec",
+    "--page-bg-soft": palette.backgroundSoft || "#f6f6f6",
+    "--panel-bg": palette.panel || "rgba(255,255,255,0.84)",
+    "--text-main": palette.text || "#222",
+    "--text-muted": palette.muted || "#666",
+    "--hero-start": palette.heroStart || "#5485c7",
+    "--hero-end": palette.heroEnd || "#3f64a9",
+    "--card-start": palette.cardStart || "#6a8fd0",
+    "--card-end": palette.cardEnd || "#4c70b7",
+    "--cloud-color": palette.cloud || "rgba(255,255,255,0.65)",
+  };
+}
+
+function applyScene(scene) {
+  const app = document.querySelector("#app");
+  const vars = getSceneVars(scene);
+  Object.entries(vars).forEach(([key, value]) => app.style.setProperty(key, value));
+}
+
+function icon(name) {
+  return ICONS[name] || "•";
+}
+
+function parseHash() {
+  const hash = window.location.hash || "#/";
+  const parts = hash.replace(/^#\//, "").split("/").filter(Boolean);
+
+  if (parts.length === 0) {
+    return { view: "library" };
+  }
+  if (parts[0] === "modules" && parts[1] && parts[2] === "pages" && parts[3]) {
+    return { view: "module", moduleSlug: parts[1], pageSlug: parts[3] };
+  }
+  if (parts[0] === "modules" && parts[1]) {
+    return { view: "module", moduleSlug: parts[1], pageSlug: null };
+  }
+  return { view: "library" };
+}
+
+function moduleHref(moduleSlug) {
+  return `#/modules/${moduleSlug}`;
+}
+
+function pageHref(moduleSlug, pageSlug) {
+  return `#/modules/${moduleSlug}/pages/${pageSlug}`;
+}
+
+function formatMark(mark) {
+  return escapeHtml(mark || "").replace(/\n/g, "<br>");
+}
+
+function renderTopNav(topNav) {
+  return `
+    <header class="topbar">
+      <button class="round-button" type="button" aria-label="Menu">☰</button>
+      <nav class="capsule-nav">
+        ${topNav
+          .map(
+            (item, index) => `
+              <span class="capsule-link ${index === 0 ? "is-active" : ""}">
+                <span class="capsule-icon">${icon(item.icon)}</span>
+                ${escapeHtml(item.label)}
+              </span>
+            `,
+          )
+          .join("")}
+      </nav>
+      <button class="round-button" type="button" aria-label="Account">↗</button>
+    </header>
+  `;
+}
+
+function renderLibrary(manifest, modules) {
+  const hero = manifest.expression.library?.hero || {};
+  const quickLinks = manifest.expression.library?.quickLinks || [];
+  const topNav = manifest.expression.library?.topNav || [];
+  const app = document.querySelector("#app");
+
+  applyScene({
+    palette: {
+      background: "#ececec",
+      backgroundSoft: "#f8f8f8",
+      panel: "rgba(255,255,255,0.84)",
+      text: "#242424",
+      muted: "#6e6e6e",
+      heroStart: "#4f84d3",
+      heroEnd: "#5776ce",
+      cardStart: "#4f84d3",
+      cardEnd: "#5776ce",
+      cloud: "rgba(255,255,255,0.72)",
+    },
+  });
+
+  app.innerHTML = `
+    <div class="screen screen-library">
+      ${renderTopNav(topNav)}
+
+      <section class="library-hero">
+        <div class="rainbow"></div>
+        <div class="logo-lockup">
+          <div class="logo-kicker">THE</div>
+          <h1 class="logo-title">${escapeHtml(hero.rainbowLabel || manifest.expression.title)}</h1>
+          <div class="logo-subtitle">${escapeHtml(hero.subtitle || manifest.island.island.name)}</div>
+        </div>
+      </section>
+
+      <section class="series-stack">
+        ${modules
+          .map(
+            (module) => `
+              <a
+                href="${moduleHref(module.slug)}"
+                class="series-card ${module.status === "locked" ? "is-locked" : ""}"
+                style="--series-start:${module.scene.palette?.cardStart}; --series-end:${module.scene.palette?.cardEnd}; --series-cloud:${module.scene.palette?.cloud};"
+              >
+                <div class="series-clouds"></div>
+                <div class="series-copy">
+                  <div class="series-label">${escapeHtml(module.presentation?.libraryLabel || module.title)}</div>
+                  <div class="series-mark">${formatMark(module.presentation?.libraryMark || module.title)}</div>
+                </div>
+                <div class="series-status ${module.status === "locked" ? "is-locked" : "is-open"}">
+                  ${module.status === "locked" ? "🔒" : "✔"}
+                </div>
+              </a>
+            `,
+          )
+          .join("")}
+      </section>
+
+      <section class="quick-links">
+        ${quickLinks
+          .map(
+            (item) => `
+              <div class="quick-link">
+                <div class="quick-emoji">${escapeHtml(item.emoji || "•")}</div>
+                <div class="quick-label">${escapeHtml(item.label)}</div>
+              </div>
+            `,
+          )
+          .join("")}
+      </section>
+    </div>
+  `;
 }
 
 function renderBlock(block) {
   if (block.type === "richText") {
     return `
-      <section class="lesson-block">
-        ${block.title ? `<div class="eyebrow">${block.title}</div>` : ""}
+      <section class="content-card">
+        ${block.title ? `<div class="section-eyebrow">${escapeHtml(block.title)}</div>` : ""}
         <div class="rich-text">${markdownToHtml(block.markdown || "")}</div>
       </section>
     `;
@@ -148,33 +301,31 @@ function renderBlock(block) {
 
   if (block.type === "quote") {
     return `
-      <section class="quote-block">
-        <div class="eyebrow">Reflection</div>
+      <section class="content-card quote-card">
+        <div class="section-eyebrow">Reflection</div>
         <blockquote>${escapeHtml(block.quote)}</blockquote>
-        ${block.attribution ? `<p class="quote-attribution">${escapeHtml(block.attribution)}</p>` : ""}
+        ${block.attribution ? `<div class="quote-source">${escapeHtml(block.attribution)}</div>` : ""}
       </section>
     `;
   }
 
   if (block.type === "video") {
     return `
-      <section class="video-block">
-        <div class="eyebrow">${escapeHtml(block.label || "Practice Video")}</div>
-        <div class="video-frame">${escapeHtml(block.placeholder || "Guided Practice")}</div>
-        <div class="video-meta">${escapeHtml(block.description || "")}</div>
+      <section class="content-card">
+        <div class="section-eyebrow">${escapeHtml(block.label || "Practice Video")}</div>
+        <div class="video-placeholder">${escapeHtml(block.placeholder || "Guided Practice")}</div>
+        <div class="video-description">${escapeHtml(block.description || "")}</div>
       </section>
     `;
   }
 
   if (block.type === "cta") {
     return `
-      <section class="lesson-block">
-        <div class="eyebrow">${escapeHtml(block.kicker || "Continue")}</div>
+      <section class="content-card cta-card">
+        <div class="section-eyebrow">${escapeHtml(block.kicker || "Continue")}</div>
         <h3>${escapeHtml(block.title)}</h3>
-        <p class="rich-text">${escapeHtml(block.body)}</p>
-        <div class="button-row">
-          <a class="cta-button" href="${block.href}">${escapeHtml(block.label)}</a>
-        </div>
+        <p>${escapeHtml(block.body)}</p>
+        <a class="pill-button" href="${block.href}">${escapeHtml(block.label)}</a>
       </section>
     `;
   }
@@ -182,105 +333,116 @@ function renderBlock(block) {
   return "";
 }
 
-function renderSceneShell(content, preset) {
-  const scene = scenePresets[preset] || scenePresets.default;
-  const app = document.querySelector("#app");
-  app.innerHTML = `
-    <div
-      class="scene-shell"
-      style="
-        --scene-glow-a: ${scene.glowA};
-        --scene-glow-b: ${scene.glowB};
-        --scene-glow-c: ${scene.glowC};
-        --scene-overlay: ${scene.overlay};
-      "
-    >
-      <div class="app-shell">${content}</div>
+function renderPageTabs(module, activePageSlug) {
+  return `
+    <div class="page-tabs">
+      ${module.pages
+        .map(
+          (page) => `
+            <button
+              class="page-tab ${page.slug === activePageSlug ? "is-active" : ""}"
+              type="button"
+              data-module-slug="${module.slug}"
+              data-page-slug="${page.slug}"
+            >
+              ${escapeHtml(page.title)}
+            </button>
+          `,
+        )
+        .join("")}
     </div>
   `;
 }
 
-function renderApp({ manifest, module, page, scene }) {
-  renderSceneShell(
-    `
-      <header class="topbar">
-        <div class="brand">
-          <div class="brand-kicker">${manifest.person.name}</div>
-          <div class="brand-title">${manifest.island.name}</div>
+function renderModuleDetail(manifest, module, page) {
+  const app = document.querySelector("#app");
+  applyScene(module.scene);
+
+  app.innerHTML = `
+    <div class="screen screen-detail">
+      ${renderTopNav(manifest.expression.library?.topNav || [])}
+
+      <section class="detail-hero">
+        <div class="hero-cloud-layer hero-cloud-a"></div>
+        <div class="hero-cloud-layer hero-cloud-b"></div>
+        <div class="detail-center">
+          <div class="detail-icon">${icon(module.presentation?.detailIcon)}</div>
+          <h1 class="detail-title">${formatMark(module.presentation?.detailTitle || module.title)}</h1>
+          <div class="detail-level">${escapeHtml(module.level || "Series")}</div>
         </div>
-      </header>
+      </section>
 
-      <main class="hero">
-        <div class="eyebrow">${manifest.expression.title}</div>
-        <h1 class="hero-title">${module.title}</h1>
-        <p class="hero-copy">${module.description}</p>
-        <div class="hero-actions">
-          <span class="button-link">${module.slug}</span>
-          <span class="button-link">${page.kind}</span>
+      <section class="detail-body">
+        <div class="content-column">
+          <div class="section-header">
+            <div class="section-eyebrow">${escapeHtml(module.title)}</div>
+            <h2>Start Here</h2>
+            <p class="section-copy">${escapeHtml(page.summary)}</p>
+          </div>
+
+          ${renderPageTabs(module, page.slug)}
+
+          <div class="content-stack">
+            ${page.blocks.map(renderBlock).join("")}
+          </div>
         </div>
-      </main>
 
-      <section class="section overview-grid">
-        <article class="panel">
-          <div class="eyebrow">Loaded module</div>
-          <h2 class="section-title">${module.title}</h2>
-          <p class="section-copy">${module.pages.length} page definitions found in module.json.</p>
-          <div class="module-meta">
-            <div><strong>First page:</strong> ${page.title}</div>
-            <div><strong>Page slug:</strong> ${page.slug}</div>
+        <aside class="detail-sidebar">
+          <div class="sidebar-card">
+            <div class="section-eyebrow">Series</div>
+            <h3>${escapeHtml(module.title)}</h3>
+            <p>${escapeHtml(module.description)}</p>
           </div>
-        </article>
-
-        <aside class="panel">
-          <div class="eyebrow">Loaded scene</div>
-          <h2>${scene.name}</h2>
-          <p class="section-copy">${scene.summary}</p>
-          <div class="progress-card">
-            <strong>Atmosphere</strong>
-            <p class="section-copy">${scene.atmosphere}</p>
+          <div class="sidebar-card">
+            <div class="section-eyebrow">Scene</div>
+            <h3>${escapeHtml(module.scene.name)}</h3>
+            <p>${escapeHtml(module.scene.atmosphere)}</p>
           </div>
+          <a class="pill-button secondary" href="#/">Back to library</a>
         </aside>
       </section>
+    </div>
+  `;
 
-      <section class="section">
-        <div class="section-header">
-          <div class="eyebrow">Loaded page</div>
-          <h2 class="lesson-title">${page.title}</h2>
-          <p class="section-copy">${page.summary}</p>
-        </div>
-        <div class="lesson-grid">
-          ${page.blocks.map(renderBlock).join("")}
-        </div>
-      </section>
-
-      <div class="footer-note">
-        Simple renderer: manifest -> first module -> first page from /island/content.
-      </div>
-    `,
-    scene.preset,
-  );
+  app.querySelectorAll("[data-page-slug]").forEach((button) => {
+    button.addEventListener("click", () => {
+      window.location.hash = pageHref(button.dataset.moduleSlug, button.dataset.pageSlug);
+    });
+  });
 }
 
 function renderError(error) {
-  renderSceneShell(
-    `
-      <section class="panel">
-        <div class="eyebrow">Renderer error</div>
-        <h1 class="section-title">The island content could not be loaded.</h1>
-        <p class="section-copy">${escapeHtml(error.message)}</p>
+  const app = document.querySelector("#app");
+  app.innerHTML = `
+    <div class="screen screen-library">
+      <section class="content-card">
+        <div class="section-eyebrow">Renderer error</div>
+        <h2>The renderer could not load this island folder.</h2>
+        <p>${escapeHtml(error.message)}</p>
       </section>
-    `,
-    "default",
-  );
+    </div>
+  `;
 }
 
-async function main() {
+async function renderRoute() {
   try {
-    const data = await loadIslandData();
-    renderApp(data);
+    const manifest = await loadManifest();
+    const modules = await loadModules();
+    const route = parseHash();
+
+    if (route.view === "module") {
+      const module = modules.find((item) => item.slug === route.moduleSlug) || modules[0];
+      const pageSlug = route.pageSlug || module.entryPage || module.pages[0].slug;
+      const page = await loadPage(module, pageSlug);
+      renderModuleDetail(manifest, module, page);
+      return;
+    }
+
+    renderLibrary(manifest, modules);
   } catch (error) {
     renderError(error);
   }
 }
 
-window.addEventListener("DOMContentLoaded", main);
+window.addEventListener("hashchange", renderRoute);
+window.addEventListener("DOMContentLoaded", renderRoute);

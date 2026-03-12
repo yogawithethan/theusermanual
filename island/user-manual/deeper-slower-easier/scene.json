@@ -1,0 +1,18 @@
+{
+  "name": "Clouds / Lightness",
+  "preset": "clouds",
+  "summary": "Soft brightness, low-contrast air, and less visual pressure.",
+  "atmosphere": "The scene should support ease without turning flat. Soft edges and spacious typography do most of the work.",
+  "palette": {
+    "background": "#dfe9f7",
+    "backgroundSoft": "#edf4fd",
+    "panel": "rgba(255,255,255,0.82)",
+    "text": "#113c72",
+    "muted": "#5f7fa6",
+    "heroStart": "#2b85e4",
+    "heroEnd": "#2f6dc7",
+    "cardStart": "#3091f0",
+    "cardEnd": "#2e68c6",
+    "cloud": "rgba(255,255,255,0.92)"
+  }
+}

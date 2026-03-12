@@ -1,0 +1,48 @@
+{
+  "id": "user-manual",
+  "title": "The User Manual",
+  "description": "A calm, immersive learning expression that turns structured teaching into themed modules, deliberate navigation, and portable lesson content.",
+  "library": {
+    "hero": {
+      "rainbowLabel": "The User Manual",
+      "subtitle": "Yoga with Ethan"
+    },
+    "topNav": [
+      {
+        "label": "Library",
+        "icon": "briefcase"
+      },
+      {
+        "label": "Live",
+        "icon": "calendar"
+      },
+      {
+        "label": "Roadmap",
+        "icon": "map"
+      },
+      {
+        "label": "Sign up",
+        "icon": "spark"
+      }
+    ],
+    "quickLinks": [
+      {
+        "label": "Practice",
+        "emoji": "🎯"
+      },
+      {
+        "label": "FAQs",
+        "emoji": "❓"
+      },
+      {
+        "label": "Downloads",
+        "emoji": "📥"
+      }
+    ]
+  },
+  "modules": [
+    "gravity-yoga",
+    "wake-the-f-up",
+    "deeper-slower-easier"
+  ]
+}

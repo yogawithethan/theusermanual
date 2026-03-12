@@ -17,7 +17,8 @@ Then open `http://localhost:8000/app/`.
 
 - `island/`: portable island package
 - `island/schema/`: content model and structural rules
-- `island/content/`: person, island, expression, module, page, and markdown content
+- `island/island.json`: island-level metadata and expression references
+- `island/user-manual/`: expression instance with module folders and page files
 - `app/`: renderer implementation only
 
 The intended split follows `Person -> Island -> Expression -> Page -> Block`, with schema and content staying portable outside the renderer.

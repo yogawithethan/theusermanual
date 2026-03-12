@@ -8,7 +8,7 @@
       "type": "richText",
       "title": "Lesson Notes",
       "source": {
-        "markdown": "content/lesson-1.md"
+        "markdown": "lesson-1.md"
       }
     },
     {

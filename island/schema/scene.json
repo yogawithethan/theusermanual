@@ -55,7 +55,39 @@
     },
     "palette": {
       "type": "object",
-      "additionalProperties": true
+      "additionalProperties": false,
+      "properties": {
+        "background": {
+          "type": "string"
+        },
+        "backgroundSoft": {
+          "type": "string"
+        },
+        "panel": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "muted": {
+          "type": "string"
+        },
+        "heroStart": {
+          "type": "string"
+        },
+        "heroEnd": {
+          "type": "string"
+        },
+        "cardStart": {
+          "type": "string"
+        },
+        "cardEnd": {
+          "type": "string"
+        },
+        "cloud": {
+          "type": "string"
+        }
+      }
     }
   }
 }

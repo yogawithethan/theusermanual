@@ -2,6 +2,15 @@
   "slug": "deeper-slower-easier",
   "title": "Deeper, Slower, Easier",
   "description": "A lighter module focused on reducing unnecessary strain. The scene aims for softness, air, and patient ease.",
+  "status": "available",
+  "level": "Level 1",
+  "entryPage": "intro",
+  "presentation": {
+    "libraryLabel": "level 1",
+    "libraryMark": "deeper.\nslower.\neasier.",
+    "detailIcon": "cloud",
+    "detailTitle": "deeper.\nslower.\neasier."
+  },
   "pages": [
     {
       "slug": "intro",

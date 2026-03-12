@@ -1,0 +1,18 @@
+{
+  "name": "Cosmic / Planetary",
+  "preset": "cosmic",
+  "summary": "Starfield atmosphere, deep blues, and a sense of quiet orbit.",
+  "atmosphere": "Slow pacing, low visual noise, and wide negative space help the body feel heavier and the mind feel further out.",
+  "palette": {
+    "background": "#ecedf0",
+    "backgroundSoft": "#f6f7f9",
+    "panel": "rgba(255,255,255,0.84)",
+    "text": "#ffffff",
+    "muted": "rgba(255,255,255,0.76)",
+    "heroStart": "#1d2648",
+    "heroEnd": "#4f2f88",
+    "cardStart": "#a8aaae",
+    "cardEnd": "#8b8e93",
+    "cloud": "rgba(255,255,255,0.5)"
+  }
+}

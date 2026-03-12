@@ -24,6 +24,60 @@
       "type": "string",
       "minLength": 1
     },
+    "library": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hero": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "rainbowLabel": {
+              "type": "string"
+            },
+            "subtitle": {
+              "type": "string"
+            }
+          }
+        },
+        "topNav": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "quickLinks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "emoji": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
     "modules": {
       "type": "array",
       "minItems": 1,

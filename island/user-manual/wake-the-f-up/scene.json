@@ -1,0 +1,18 @@
+{
+  "name": "Ocean Sunset",
+  "preset": "ocean",
+  "summary": "Warm horizon light over cooler blue depth.",
+  "atmosphere": "Clearer contrast, brighter highlights, and a little more edge. This scene should feel alive rather than sleepy.",
+  "palette": {
+    "background": "#f3efe8",
+    "backgroundSoft": "#fff8ef",
+    "panel": "rgba(255,255,255,0.82)",
+    "text": "#fff8eb",
+    "muted": "rgba(255,248,235,0.84)",
+    "heroStart": "#f4c115",
+    "heroEnd": "#f3de9e",
+    "cardStart": "#f2c317",
+    "cardEnd": "#f2db7f",
+    "cloud": "rgba(255,250,236,0.16)"
+  }
+}

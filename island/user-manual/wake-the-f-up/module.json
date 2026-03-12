@@ -2,6 +2,15 @@
   "slug": "wake-the-f-up",
   "title": "Wake the F*** Up",
   "description": "A sharper module for energy, honesty, and getting present. The environment leans into heat, water, and contrast.",
+  "status": "available",
+  "level": "Series",
+  "entryPage": "intro",
+  "presentation": {
+    "libraryLabel": "wake the f*ck up",
+    "libraryMark": "wake\nthe\nf*ck up",
+    "detailIcon": "sun",
+    "detailTitle": "wake\nthe\nf*ck up"
+  },
   "pages": [
     {
       "slug": "intro",
