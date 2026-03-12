@@ -17,7 +17,7 @@
   "expressions": [
     {
       "id": "user-manual",
-      "path": "./user-manual/expression.json"
+      "path": "./expressions/user-manual/expression.json"
     }
   ]
 }

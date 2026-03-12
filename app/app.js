@@ -123,7 +123,7 @@ async function loadPage(module, pageSlug) {
     return state.pages.get(key);
   }
 
-  const page = await loadJson(`${module.basePath}/${pageSlug}.json`);
+  const page = await loadJson(`${module.basePath}/pages/${pageSlug}/page.json`);
   const blocks = await Promise.all(
     page.blocks.map(async (block) => {
       if (block.type === "richText" && block.source?.markdown) {

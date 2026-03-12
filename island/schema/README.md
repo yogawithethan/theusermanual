@@ -15,11 +15,11 @@ Person -> Island -> Expression -> Page -> Block
 ## Current package
 
 - `island.json`: top-level person, island, theme, and expression references
-- `user-manual/expression.json`: expression-level metadata
-- `user-manual/*/module.json`: module metadata
-- `user-manual/*/scene.json`: module atmosphere overrides
-- `user-manual/*/*.json`: portable page definitions
-- `user-manual/*/*.md`: lesson text sources
+- `expressions/user-manual/expression.json`: expression-level metadata
+- `expressions/user-manual/*/module.json`: module metadata
+- `expressions/user-manual/*/scene.json`: module atmosphere overrides
+- `expressions/user-manual/*/pages/*/page.json`: portable page definitions
+- `expressions/user-manual/*/pages/*/content.md`: lesson text sources
 
 ## Schema files
 

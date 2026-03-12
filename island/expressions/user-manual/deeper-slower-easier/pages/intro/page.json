@@ -8,7 +8,7 @@
       "type": "richText",
       "title": "Orientation",
       "source": {
-        "markdown": "intro.md"
+        "markdown": "pages/intro/content.md"
       }
     },
     {
