@@ -1,0 +1,26 @@
+{
+  "slug": "lesson-1",
+  "title": "Lesson 1: Yield to Gravity",
+  "kind": "lesson",
+  "summary": "Lengthen the breath, reduce muscular ambition, and allow gravity to do more of the teaching.",
+  "blocks": [
+    {
+      "type": "richText",
+      "title": "Lesson Notes",
+      "source": {
+        "markdown": "content/lesson-1.md"
+      }
+    },
+    {
+      "type": "video",
+      "label": "Guided sequence",
+      "placeholder": "24 minute practice",
+      "description": "A placeholder video block for the first renderer. Replace with real media wiring later."
+    },
+    {
+      "type": "quote",
+      "quote": "Less force creates more room.",
+      "attribution": "Lesson cue"
+    }
+  ]
+}

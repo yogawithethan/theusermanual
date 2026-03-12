@@ -1,0 +1,19 @@
+{
+  "slug": "deeper-slower-easier",
+  "title": "Deeper, Slower, Easier",
+  "description": "A lighter module focused on reducing unnecessary strain. The scene aims for softness, air, and patient ease.",
+  "pages": [
+    {
+      "slug": "intro",
+      "title": "Intro Page",
+      "kind": "overview",
+      "summary": "The practice of making movement simpler without making it vague."
+    },
+    {
+      "slug": "lesson-1",
+      "title": "Lesson 1: Remove the Extra",
+      "kind": "lesson",
+      "summary": "Find where effort accumulates and deliberately reduce it."
+    }
+  ]
+}

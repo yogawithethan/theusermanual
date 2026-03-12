@@ -1,0 +1,330 @@
+:root {
+  --font-display: "Iowan Old Style", "Palatino Linotype", serif;
+  --font-body: "Avenir Next", "Helvetica Neue", sans-serif;
+  --bg: #0f1720;
+  --bg-accent: #1a2838;
+  --panel: rgba(10, 15, 24, 0.68);
+  --panel-strong: rgba(8, 12, 20, 0.82);
+  --text: #f5efe3;
+  --muted: #c9c1b4;
+  --line: rgba(255, 255, 255, 0.12);
+  --button-bg: rgba(245, 239, 227, 0.14);
+  --button-text: #fff6ea;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 25%),
+    radial-gradient(circle at 80% 10%, rgba(255, 206, 119, 0.14), transparent 20%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-accent) 100%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+}
+
+.scene-shell {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.scene-shell::before,
+.scene-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scene-shell::before {
+  background:
+    radial-gradient(circle at 15% 25%, var(--scene-glow-a), transparent 24%),
+    radial-gradient(circle at 85% 15%, var(--scene-glow-b), transparent 18%),
+    radial-gradient(circle at 50% 120%, var(--scene-glow-c), transparent 38%);
+  opacity: 0.95;
+}
+
+.scene-shell::after {
+  background-image: var(--scene-overlay);
+  opacity: 0.45;
+}
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.brand {
+  display: grid;
+  gap: 4px;
+}
+
+.brand-kicker,
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.brand-title,
+.hero-title,
+.section-title,
+.module-title,
+.lesson-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.brand-title {
+  font-size: 1.05rem;
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.nav-link,
+.button-link,
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  padding: 12px 18px;
+  backdrop-filter: blur(10px);
+}
+
+.nav-link.is-active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.hero,
+.panel,
+.module-card,
+.lesson-block,
+.quote-block,
+.video-block {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.hero {
+  padding: 40px;
+}
+
+.hero-grid,
+.overview-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.hero-title {
+  margin: 10px 0 14px;
+  font-size: clamp(2.8rem, 7vw, 5.2rem);
+  line-height: 0.96;
+}
+
+.hero-copy,
+.section-copy,
+.module-description,
+.rich-text,
+.video-meta,
+.quote-attribution {
+  color: var(--muted);
+}
+
+.hero-actions,
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.feature-grid,
+.module-grid,
+.lesson-grid {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.feature-card,
+.module-meta,
+.progress-card {
+  padding: 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.section {
+  margin-top: 26px;
+}
+
+.section-header {
+  margin-bottom: 18px;
+}
+
+.section-title,
+.module-title,
+.lesson-title {
+  margin: 0;
+  font-size: clamp(1.9rem, 3vw, 2.8rem);
+}
+
+.module-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.module-card {
+  padding: 24px;
+}
+
+.module-card-scene {
+  display: inline-flex;
+  margin-bottom: 18px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.module-card h3 {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.meta-row,
+.lesson-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hero-grid {
+  grid-template-columns: 1.5fr 1fr;
+  align-items: end;
+}
+
+.overview-grid {
+  grid-template-columns: 1.35fr 0.9fr;
+  align-items: start;
+}
+
+.panel {
+  padding: 28px;
+}
+
+.lesson-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lesson-block,
+.quote-block,
+.video-block {
+  padding: 28px;
+}
+
+.rich-text p,
+.rich-text ul {
+  line-height: 1.8;
+}
+
+.rich-text ul {
+  padding-left: 20px;
+}
+
+.quote-block blockquote {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  line-height: 1.2;
+}
+
+.video-frame {
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  margin-bottom: 16px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent),
+    rgba(0, 0, 0, 0.35);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+}
+
+.footer-note {
+  margin-top: 36px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 860px) {
+  .hero-grid,
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero,
+  .panel,
+  .module-card,
+  .lesson-block,
+  .quote-block,
+  .video-block {
+    border-radius: 24px;
+  }
+
+  .app-shell {
+    padding: 18px;
+  }
+
+  .hero {
+    padding: 28px;
+  }
+}

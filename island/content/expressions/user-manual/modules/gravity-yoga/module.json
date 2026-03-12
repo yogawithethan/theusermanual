@@ -1,0 +1,19 @@
+{
+  "slug": "gravity-yoga",
+  "title": "Gravity Yoga",
+  "description": "A slower descent into fascia, long holds, and planetary spaciousness. This module frames mobility as surrender rather than force.",
+  "pages": [
+    {
+      "slug": "intro",
+      "title": "Intro Page",
+      "kind": "overview",
+      "summary": "Why long holds work, what to expect, and how to enter the module."
+    },
+    {
+      "slug": "lesson-1",
+      "title": "Lesson 1: Yield to Gravity",
+      "kind": "lesson",
+      "summary": "A first practice in releasing effort and finding sustainable shape."
+    }
+  ]
+}

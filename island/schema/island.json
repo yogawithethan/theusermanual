@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./island.json",
+  "title": "Island Manifest Schema",
+  "description": "Top-level portable manifest for a person, island, and its expressions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "person",
+    "island",
+    "expression"
+  ],
+  "properties": {
+    "person": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "island": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "theme"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "theme": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "palette": {
+              "type": "string"
+            },
+            "fonts": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "display": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "expression": {
+      "$ref": "./expression.json"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "slug": "intro",
+  "title": "Intro Page",
+  "kind": "overview",
+  "summary": "Going deeper often starts by doing less, not more.",
+  "blocks": [
+    {
+      "type": "richText",
+      "title": "Orientation",
+      "source": {
+        "markdown": "content/intro.md"
+      }
+    },
+    {
+      "type": "quote",
+      "quote": "Ease is not laziness. It is precision without waste.",
+      "attribution": "Module principle"
+    },
+    {
+      "type": "cta",
+      "kicker": "Continue",
+      "title": "Begin the first lesson",
+      "body": "Work through a gentle practice that trains you to notice and remove extra effort before it compounds.",
+      "label": "Open Lesson 1",
+      "href": "#/modules/deeper-slower-easier/pages/lesson-1"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "slug": "intro",
+  "title": "Intro Page",
+  "kind": "overview",
+  "summary": "Gravity Yoga uses long holds to shift the relationship between stretch, time, and surrender.",
+  "blocks": [
+    {
+      "type": "richText",
+      "title": "Orientation",
+      "source": {
+        "markdown": "content/intro.md"
+      }
+    },
+    {
+      "type": "quote",
+      "quote": "The pose starts working when you stop trying to win it.",
+      "attribution": "Gravity Yoga principle"
+    },
+    {
+      "type": "cta",
+      "kicker": "Ready to begin",
+      "title": "Move into the first lesson",
+      "body": "Start with the opening practice and learn how to let structure hold you without muscular overreach.",
+      "label": "Open Lesson 1",
+      "href": "#/modules/gravity-yoga/pages/lesson-1"
+    }
+  ]
+}

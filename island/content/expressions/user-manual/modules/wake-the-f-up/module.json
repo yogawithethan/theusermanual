@@ -1,0 +1,19 @@
+{
+  "slug": "wake-the-f-up",
+  "title": "Wake the F*** Up",
+  "description": "A sharper module for energy, honesty, and getting present. The environment leans into heat, water, and contrast.",
+  "pages": [
+    {
+      "slug": "intro",
+      "title": "Intro Page",
+      "kind": "overview",
+      "summary": "A reset for attention, energy, and commitment."
+    },
+    {
+      "slug": "lesson-1",
+      "title": "Lesson 1: Interrupt Autopilot",
+      "kind": "lesson",
+      "summary": "Create enough friction to notice where your day is running you."
+    }
+  ]
+}

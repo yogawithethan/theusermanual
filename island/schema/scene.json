@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./scene.json",
+  "title": "Scene Schema",
+  "description": "Atmospheric styling metadata that can be applied to a module or page.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "preset",
+    "summary",
+    "atmosphere"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "preset": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "atmosphere": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audio": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "src": {
+          "type": "string",
+          "minLength": 1
+        },
+        "loop": {
+          "type": "boolean"
+        }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "display": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        }
+      }
+    },
+    "palette": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

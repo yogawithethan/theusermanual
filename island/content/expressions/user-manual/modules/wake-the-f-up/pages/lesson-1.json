@@ -1,0 +1,20 @@
+{
+  "slug": "lesson-1",
+  "title": "Lesson 1: Interrupt Autopilot",
+  "kind": "lesson",
+  "summary": "Use breath, sound, and pace shifts to create conscious re-entry into the body.",
+  "blocks": [
+    {
+      "type": "richText",
+      "title": "Lesson Notes",
+      "source": {
+        "markdown": "content/lesson-1.md"
+      }
+    },
+    {
+      "type": "quote",
+      "quote": "Wakefulness is a refusal to drift.",
+      "attribution": "Module cue"
+    }
+  ]
+}

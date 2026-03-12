@@ -1,0 +1,23 @@
+{
+  "slug": "intro",
+  "title": "Intro Page",
+  "kind": "overview",
+  "summary": "Wakefulness here means contact with reality, not just more stimulation.",
+  "blocks": [
+    {
+      "type": "richText",
+      "title": "Orientation",
+      "source": {
+        "markdown": "content/intro.md"
+      }
+    },
+    {
+      "type": "cta",
+      "kicker": "Start the module",
+      "title": "Open the first practice",
+      "body": "Move into a short lesson designed to cut through low-grade numbness and passive momentum.",
+      "label": "Open Lesson 1",
+      "href": "#/modules/wake-the-f-up/pages/lesson-1"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "slug": "lesson-1",
+  "title": "Lesson 1: Remove the Extra",
+  "kind": "lesson",
+  "summary": "Strip away nonessential effort until the main action becomes easier to feel.",
+  "blocks": [
+    {
+      "type": "richText",
+      "title": "Lesson Notes",
+      "source": {
+        "markdown": "content/lesson-1.md"
+      }
+    },
+    {
+      "type": "video",
+      "label": "Guided practice",
+      "placeholder": "12 minute unwinding",
+      "description": "Placeholder media for the first renderer. The schema already separates this block from the page layout."
+    }
+  ]
+}
