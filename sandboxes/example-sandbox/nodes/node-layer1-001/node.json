@@ -1,0 +1,18 @@
+{
+  "id": "node-layer1-001",
+  "type": "layer1",
+  "title": "Featured Collection",
+  "slug": "featured-collection",
+  "parentId": "root",
+  "children": [
+    "node-layer2-001"
+  ],
+  "template": "pill-card",
+  "themeRef": "default",
+  "sceneRef": "default",
+  "icon": "sparkles",
+  "description": "Top-level collection inside the sandbox.",
+  "contentFile": null,
+  "createdAt": "2026-03-14T00:00:00.000Z",
+  "updatedAt": "2026-03-14T00:00:00.000Z"
+}

@@ -1,0 +1,16 @@
+{
+  "id": "node-content-001",
+  "type": "content",
+  "title": "Lesson 1: Radiate",
+  "slug": "lesson-1-radiate",
+  "parentId": "node-layer4-001",
+  "children": [],
+  "template": "lesson-page",
+  "themeRef": "default",
+  "sceneRef": "default",
+  "icon": null,
+  "description": "Leaf content page used for preview and editing.",
+  "contentFile": "content.md",
+  "createdAt": "2026-03-14T00:00:00.000Z",
+  "updatedAt": "2026-03-14T00:00:00.000Z"
+}

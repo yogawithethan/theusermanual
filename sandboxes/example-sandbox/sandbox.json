@@ -1,0 +1,39 @@
+{
+  "id": "example-sandbox",
+  "title": "Example Sandbox",
+  "rootNodeId": "root",
+  "layerLabels": {
+    "layer1": "expressions",
+    "layer2": "brands",
+    "layer3": "offerings",
+    "layer4": "experiences",
+    "content": "content"
+  },
+  "allowedChildTypes": {
+    "root": [
+      "layer1"
+    ],
+    "layer1": [
+      "layer2"
+    ],
+    "layer2": [
+      "layer3"
+    ],
+    "layer3": [
+      "layer4"
+    ],
+    "layer4": [
+      "content"
+    ],
+    "content": []
+  },
+  "defaultTemplates": {
+    "layer1": "pill-card",
+    "layer2": "pill-card",
+    "layer3": "pill-card",
+    "layer4": "lesson-pill",
+    "content": "lesson-page"
+  },
+  "defaultTheme": "default",
+  "defaultScene": "default"
+}

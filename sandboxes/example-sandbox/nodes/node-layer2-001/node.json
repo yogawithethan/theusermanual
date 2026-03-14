@@ -1,0 +1,18 @@
+{
+  "id": "node-layer2-001",
+  "type": "layer2",
+  "title": "Breath Work",
+  "slug": "breath-work",
+  "parentId": "node-layer1-001",
+  "children": [
+    "node-layer3-001"
+  ],
+  "template": "pill-card",
+  "themeRef": "default",
+  "sceneRef": "default",
+  "icon": "cloud",
+  "description": "Second layer item with customizable vocabulary.",
+  "contentFile": null,
+  "createdAt": "2026-03-14T00:00:00.000Z",
+  "updatedAt": "2026-03-14T00:00:00.000Z"
+}

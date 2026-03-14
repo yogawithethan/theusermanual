@@ -1,0 +1,18 @@
+{
+  "id": "node-layer3-001",
+  "type": "layer3",
+  "title": "Morning Reset",
+  "slug": "morning-reset",
+  "parentId": "node-layer2-001",
+  "children": [
+    "node-layer4-001"
+  ],
+  "template": "pill-card",
+  "themeRef": "default",
+  "sceneRef": "default",
+  "icon": "sun",
+  "description": "Third layer grouping for a branch of content.",
+  "contentFile": null,
+  "createdAt": "2026-03-14T00:00:00.000Z",
+  "updatedAt": "2026-03-14T00:00:00.000Z"
+}

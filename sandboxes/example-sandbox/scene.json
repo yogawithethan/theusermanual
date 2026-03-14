@@ -1,0 +1,22 @@
+{
+  "id": "default",
+  "layout": "center-column",
+  "background": {
+    "type": "pattern",
+    "value": "dot-grid"
+  },
+  "navigation": {
+    "showSearch": true,
+    "showMenu": true,
+    "showAccount": true
+  },
+  "nodeLayout": {
+    "direction": "vertical",
+    "gap": 16,
+    "align": "center"
+  },
+  "preview": {
+    "deviceFrame": "desktop",
+    "showCanvas": true
+  }
+}

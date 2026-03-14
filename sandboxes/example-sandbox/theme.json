@@ -1,0 +1,32 @@
+{
+  "id": "default",
+  "fonts": {
+    "heading": "Poppins",
+    "subheading": "Poppins",
+    "body": "Inter"
+  },
+  "colors": {
+    "background": "#f5f2ee",
+    "text": "#111111",
+    "muted": "#9a9a9a",
+    "border": "#111111",
+    "accent": "#2f6fdb"
+  },
+  "card": {
+    "radius": 28,
+    "borderWidth": 2,
+    "shadow": {
+      "x": 0,
+      "y": 6,
+      "blur": 18,
+      "spread": 0,
+      "color": "rgba(0,0,0,0.12)"
+    }
+  },
+  "effects": {
+    "uppercase": false,
+    "underline": false,
+    "italic": false,
+    "boldHeading": true
+  }
+}

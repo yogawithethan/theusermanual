@@ -1,0 +1,18 @@
+{
+  "id": "node-layer4-001",
+  "type": "layer4",
+  "title": "Level 1",
+  "slug": "level-1",
+  "parentId": "node-layer3-001",
+  "children": [
+    "node-content-001"
+  ],
+  "template": "lesson-pill",
+  "themeRef": "default",
+  "sceneRef": "default",
+  "icon": null,
+  "description": "Fourth layer item leading into leaf content.",
+  "contentFile": null,
+  "createdAt": "2026-03-14T00:00:00.000Z",
+  "updatedAt": "2026-03-14T00:00:00.000Z"
+}
