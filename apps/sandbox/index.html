@@ -8,86 +8,346 @@
   </head>
   <body>
     <div id="app">
-      <header class="topbar">
-        <div>
-          <div class="eyebrow">Local Editor</div>
+      <header class="app-header">
+        <div class="brand-copy">
+          <div class="eyebrow">Local World Builder</div>
           <h1>Islands • Sandbox</h1>
-          <p class="subcopy">Separate from the public User Manual site. This shell edits local sandbox files through the shared core engine.</p>
+          <p class="intro-copy">
+            Build your world visually. The files stay underneath, but this space is for creating, styling, and moving deeper through the hierarchy without touching code.
+          </p>
         </div>
-        <div class="status-pill" id="status-pill">Connecting...</div>
+
+        <div class="header-tools">
+          <div class="status-pill" id="status-pill">Loading local sandbox…</div>
+
+          <div class="device-switch" id="device-switch" aria-label="Preview device">
+            <button type="button" class="device-button is-active" data-device="desktop">Desktop</button>
+            <button type="button" class="device-button" data-device="tablet">Tablet</button>
+            <button type="button" class="device-button" data-device="mobile">Mobile</button>
+          </div>
+        </div>
       </header>
 
-      <main class="layout">
-        <section class="panel">
-          <div class="panel-head">
+      <main class="workspace">
+        <section class="panel explorer-panel">
+          <div class="section-heading">
             <div>
               <div class="eyebrow">Hierarchy</div>
-              <h2>Node Browser</h2>
+              <h2>World Explorer</h2>
             </div>
+            <p class="section-copy">Pick a card to go deeper. Each column reveals the next layer.</p>
           </div>
-          <div id="columns" class="columns"></div>
+
+          <div class="columns" id="columns"></div>
         </section>
 
-        <section class="panel">
-          <div class="panel-head">
+        <section class="panel studio-panel">
+          <div class="section-heading studio-heading">
             <div>
-              <div class="eyebrow">Inspector</div>
-              <h2 id="inspector-title">Select a node</h2>
+              <div class="eyebrow" id="selection-label">Canvas</div>
+              <h2 id="canvas-title">Choose a card to start</h2>
+            </div>
+            <div class="action-cluster" id="canvas-actions"></div>
+          </div>
+
+          <div class="breadcrumb-trail" id="breadcrumb-trail"></div>
+
+          <div class="canvas-shell">
+            <div class="canvas-frame device-desktop" id="canvas-frame">
+              <div class="canvas-preview" id="canvas-preview"></div>
             </div>
           </div>
-          <form id="metadata-form" class="stack">
+
+          <section class="story-panel hidden" id="story-panel">
+            <div class="story-heading">
+              <div>
+                <div class="eyebrow">Page Copy</div>
+                <h3>Story Editor</h3>
+              </div>
+              <button type="button" class="button primary" id="save-content">Save Page Copy</button>
+            </div>
+
+            <label class="field">
+              <span>Write the page in a simple, human way. Line breaks will preview below.</span>
+              <textarea id="story-editor" rows="10" placeholder="Write the story for this page."></textarea>
+            </label>
+          </section>
+
+          <section class="create-sheet hidden" id="create-sheet">
+            <div class="sheet-head">
+              <div>
+                <div class="eyebrow">Create</div>
+                <h3 id="create-title">New child</h3>
+              </div>
+              <button type="button" class="ghost-button" id="cancel-create">Close</button>
+            </div>
+
+            <form class="sheet-form" id="create-form">
+              <label class="field">
+                <span>Type</span>
+                <select id="create-type"></select>
+              </label>
+
+              <label class="field">
+                <span>Name</span>
+                <input id="create-name" type="text" placeholder="Give this card a name" />
+              </label>
+
+              <label class="field">
+                <span>Slug</span>
+                <input id="create-slug" type="text" placeholder="auto-generated-slug" />
+              </label>
+
+              <label class="field">
+                <span>Description</span>
+                <textarea id="create-description" rows="3" placeholder="What is this part of the world for?"></textarea>
+              </label>
+
+              <div class="field">
+                <span>Icon</span>
+                <div class="icon-grid" id="create-icon-grid"></div>
+              </div>
+
+              <div class="sheet-actions">
+                <button type="button" class="button secondary" id="cancel-create-secondary">Cancel</button>
+                <button type="submit" class="button primary">Create Card</button>
+              </div>
+            </form>
+          </section>
+        </section>
+
+        <aside class="panel properties-panel">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">Properties</div>
+              <h2>Guided Controls</h2>
+            </div>
+            <p class="section-copy">Adjust the selected card and the world around it with human controls, not config files.</p>
+          </div>
+
+          <form class="control-card" id="node-form">
+            <div class="control-card-head">
+              <div>
+                <div class="eyebrow">Selected Card</div>
+                <h3>Content + Card</h3>
+              </div>
+              <button type="submit" class="button primary">Save Card</button>
+            </div>
+
             <label class="field">
               <span>Title</span>
-              <input name="title" type="text" />
+              <input id="node-title" type="text" />
             </label>
+
             <label class="field">
               <span>Slug</span>
-              <input name="slug" type="text" />
+              <input id="node-slug" type="text" />
             </label>
+
             <label class="field">
               <span>Description</span>
-              <textarea name="description" rows="3"></textarea>
+              <textarea id="node-description" rows="4"></textarea>
             </label>
-            <button class="button" type="submit">Save Metadata</button>
-          </form>
-        </section>
 
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <div class="eyebrow">Content</div>
-              <h2>Markdown Editor</h2>
-            </div>
-          </div>
-          <form id="content-form" class="stack">
-            <textarea id="content-editor" rows="16" placeholder="Select a content node to edit markdown."></textarea>
-            <button class="button" type="submit">Save Content</button>
-          </form>
-        </section>
+            <label class="field">
+              <span>Card Template</span>
+              <select id="node-template">
+                <option value="pill-card">Pill Card</option>
+                <option value="lesson-pill">Lesson Pill</option>
+                <option value="lesson-page">Lesson Page</option>
+                <option value="preview-frame">Preview Frame</option>
+              </select>
+            </label>
 
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <div class="eyebrow">Theme / Scene</div>
-              <h2>Local Config</h2>
+            <div class="field">
+              <span>Icon</span>
+              <div class="icon-grid" id="node-icon-grid"></div>
             </div>
-          </div>
-          <form id="theme-form" class="stack tight">
-            <label class="field">
-              <span>Theme JSON</span>
-              <textarea id="theme-editor" rows="9"></textarea>
-            </label>
-            <button class="button secondary" type="submit">Save Theme</button>
           </form>
-          <form id="scene-form" class="stack tight">
-            <label class="field">
-              <span>Scene JSON</span>
-              <textarea id="scene-editor" rows="9"></textarea>
-            </label>
-            <button class="button secondary" type="submit">Save Scene</button>
+
+          <form class="control-card" id="theme-form">
+            <div class="control-card-head">
+              <div>
+                <div class="eyebrow">World Style</div>
+                <h3>Theme</h3>
+              </div>
+              <button type="submit" class="button secondary">Save Theme</button>
+            </div>
+
+            <div class="field-grid">
+              <label class="field">
+                <span>Heading Font</span>
+                <select id="theme-heading-font"></select>
+              </label>
+              <label class="field">
+                <span>Subheading Font</span>
+                <select id="theme-subheading-font"></select>
+              </label>
+              <label class="field">
+                <span>Body Font</span>
+                <select id="theme-body-font"></select>
+              </label>
+            </div>
+
+            <div class="field-grid colors">
+              <label class="field">
+                <span>Background</span>
+                <input id="theme-background" type="color" />
+              </label>
+              <label class="field">
+                <span>Accent</span>
+                <input id="theme-accent" type="color" />
+              </label>
+              <label class="field">
+                <span>Text</span>
+                <input id="theme-text" type="color" />
+              </label>
+              <label class="field">
+                <span>Muted</span>
+                <input id="theme-muted" type="color" />
+              </label>
+              <label class="field">
+                <span>Border</span>
+                <input id="theme-border" type="color" />
+              </label>
+              <label class="field">
+                <span>Shadow Color</span>
+                <input id="theme-shadow-color" type="color" />
+              </label>
+            </div>
+
+            <div class="field-grid sliders">
+              <label class="field">
+                <span>Card Radius <strong id="theme-radius-value"></strong></span>
+                <input id="theme-radius" type="range" min="8" max="48" step="1" />
+              </label>
+              <label class="field">
+                <span>Border Weight <strong id="theme-border-width-value"></strong></span>
+                <input id="theme-border-width" type="range" min="0" max="8" step="1" />
+              </label>
+              <label class="field">
+                <span>Shadow Lift <strong id="theme-shadow-y-value"></strong></span>
+                <input id="theme-shadow-y" type="range" min="0" max="24" step="1" />
+              </label>
+              <label class="field">
+                <span>Shadow Blur <strong id="theme-shadow-blur-value"></strong></span>
+                <input id="theme-shadow-blur" type="range" min="0" max="40" step="1" />
+              </label>
+              <label class="field">
+                <span>Shadow Opacity <strong id="theme-shadow-opacity-value"></strong></span>
+                <input id="theme-shadow-opacity" type="range" min="0" max="100" step="1" />
+              </label>
+            </div>
+
+            <div class="toggle-grid">
+              <label class="toggle">
+                <input id="theme-uppercase" type="checkbox" />
+                <span>Uppercase headings</span>
+              </label>
+              <label class="toggle">
+                <input id="theme-underline" type="checkbox" />
+                <span>Underline accents</span>
+              </label>
+              <label class="toggle">
+                <input id="theme-italic" type="checkbox" />
+                <span>Italic mood</span>
+              </label>
+              <label class="toggle">
+                <input id="theme-bold-heading" type="checkbox" />
+                <span>Bold headings</span>
+              </label>
+            </div>
           </form>
-        </section>
+
+          <form class="control-card" id="scene-form">
+            <div class="control-card-head">
+              <div>
+                <div class="eyebrow">World Layout</div>
+                <h3>Scene</h3>
+              </div>
+              <button type="submit" class="button secondary">Save Scene</button>
+            </div>
+
+            <div class="field-grid">
+              <label class="field">
+                <span>Background Style</span>
+                <select id="scene-background-type">
+                  <option value="pattern">Pattern</option>
+                  <option value="gradient">Gradient</option>
+                  <option value="solid">Solid</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Background Mood</span>
+                <select id="scene-background-value">
+                  <option value="dot-grid">Dot Grid</option>
+                  <option value="soft-sky">Soft Sky</option>
+                  <option value="warm-glow">Warm Glow</option>
+                  <option value="clean-paper">Clean Paper</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Canvas Layout</span>
+                <select id="scene-layout">
+                  <option value="center-column">Center Column</option>
+                  <option value="wide-studio">Wide Studio</option>
+                  <option value="immersive-stack">Immersive Stack</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Children Flow</span>
+                <select id="scene-direction">
+                  <option value="vertical">Vertical</option>
+                  <option value="horizontal">Horizontal</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Align</span>
+                <select id="scene-align">
+                  <option value="start">Start</option>
+                  <option value="center">Center</option>
+                  <option value="end">End</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Gap <strong id="scene-gap-value"></strong></span>
+              <input id="scene-gap" type="range" min="8" max="40" step="1" />
+            </label>
+
+            <div class="toggle-grid">
+              <label class="toggle">
+                <input id="scene-show-menu" type="checkbox" />
+                <span>Show menu</span>
+              </label>
+              <label class="toggle">
+                <input id="scene-show-search" type="checkbox" />
+                <span>Show search</span>
+              </label>
+              <label class="toggle">
+                <input id="scene-show-account" type="checkbox" />
+                <span>Show account</span>
+              </label>
+              <label class="toggle">
+                <input id="scene-show-canvas" type="checkbox" />
+                <span>Show preview canvas</span>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Default Preview Device</span>
+              <select id="scene-device-frame">
+                <option value="desktop">Desktop</option>
+                <option value="tablet">Tablet</option>
+                <option value="mobile">Mobile</option>
+              </select>
+            </label>
+          </form>
+        </aside>
       </main>
+
+      <div class="toast" id="toast" hidden></div>
     </div>
 
     <script type="module" src="./app.js"></script>

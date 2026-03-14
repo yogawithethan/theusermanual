@@ -4,9 +4,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  buildEditorColumns,
+  buildPreviewContext,
+  createNode,
+  deleteNode,
+  duplicateNode,
+  getNodeActionAvailability,
   listNodes,
-  readContent,
-  readNode,
   readSandbox,
   readScene,
   readTheme,
@@ -15,6 +19,7 @@ import {
   updateScene,
   updateTheme,
 } from "../../src/core/index.js";
+import type { PreviewDevice } from "../../src/core/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,7 +41,8 @@ function sendJson(response: ServerResponse<IncomingMessage>, statusCode: number,
 
 function sendError(response: ServerResponse<IncomingMessage>, error: unknown): void {
   const message = error instanceof Error ? error.message : "Unknown error";
-  sendJson(response, 500, { error: message });
+  const statusCode = error instanceof Error ? 400 : 500;
+  sendJson(response, statusCode, { error: message });
 }
 
 async function readBody(request: IncomingMessage): Promise<unknown> {
@@ -56,6 +62,54 @@ function requireParam(url: URL, key: string): string {
   return value;
 }
 
+function normalizeDevice(value: string | null): PreviewDevice | undefined {
+  if (value === "desktop" || value === "tablet" || value === "mobile") {
+    return value;
+  }
+  return undefined;
+}
+
+async function resolveSelectedNodeId(requestedNodeId?: string | null): Promise<string> {
+  const sandbox = await readSandbox(sandboxPath);
+  const nodes = await listNodes(sandboxPath);
+  const knownIds = new Set([sandbox.rootNodeId, ...nodes.map((node) => node.id)]);
+
+  if (requestedNodeId && knownIds.has(requestedNodeId)) {
+    return requestedNodeId;
+  }
+
+  return sandbox.rootChildren[0] ?? sandbox.rootNodeId;
+}
+
+async function readEditorState(requestUrl: URL): Promise<unknown> {
+  const selectedNodeId = await resolveSelectedNodeId(requestUrl.searchParams.get("selectedNodeId"));
+  const device = normalizeDevice(requestUrl.searchParams.get("device"));
+
+  const [sandbox, nodes, theme, scene, columns, actions, preview] = await Promise.all([
+    readSandbox(sandboxPath),
+    listNodes(sandboxPath),
+    readTheme(sandboxPath),
+    readScene(sandboxPath),
+    buildEditorColumns(sandboxPath, selectedNodeId),
+    getNodeActionAvailability(sandboxPath, selectedNodeId),
+    buildPreviewContext(sandboxPath, selectedNodeId, device),
+  ]);
+
+  return {
+    appName: "Islands • Sandbox",
+    sandboxPath,
+    selectedNodeId,
+    sandbox,
+    nodes,
+    theme,
+    scene,
+    columns,
+    actions,
+    preview,
+    content: preview.content,
+  };
+}
+
 const server = createServer(async (request, response) => {
   try {
     const method = request.method ?? "GET";
@@ -69,45 +123,32 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    if (method === "GET" && url.pathname === "/api/sandbox") {
-      sendJson(response, 200, {
-        appName: "Islands • Sandbox",
-        sandboxPath,
-        sandbox: await readSandbox(sandboxPath),
-      });
+    if (method === "GET" && url.pathname === "/api/editor-state") {
+      sendJson(response, 200, await readEditorState(url));
       return;
     }
 
-    if (method === "GET" && url.pathname === "/api/nodes") {
-      sendJson(response, 200, await listNodes(sandboxPath));
-      return;
-    }
-
-    if (method === "GET" && url.pathname === "/api/theme") {
-      sendJson(response, 200, await readTheme(sandboxPath));
-      return;
-    }
-
-    if (method === "GET" && url.pathname === "/api/scene") {
-      sendJson(response, 200, await readScene(sandboxPath));
-      return;
-    }
-
-    if (method === "GET" && url.pathname === "/api/content") {
-      const nodeId = requireParam(url, "nodeId");
-      sendJson(response, 200, { nodeId, content: await readContent(sandboxPath, nodeId) });
-      return;
-    }
-
-    if (method === "GET" && url.pathname === "/api/node") {
-      const nodeId = requireParam(url, "nodeId");
-      sendJson(response, 200, await readNode(sandboxPath, nodeId));
+    if (method === "POST" && url.pathname === "/api/node") {
+      sendJson(response, 200, await createNode(sandboxPath, (await readBody(request)) as never));
       return;
     }
 
     if (method === "PATCH" && url.pathname === "/api/node") {
       const nodeId = requireParam(url, "nodeId");
       sendJson(response, 200, await updateNode(sandboxPath, nodeId, (await readBody(request)) as never));
+      return;
+    }
+
+    if (method === "DELETE" && url.pathname === "/api/node") {
+      const nodeId = requireParam(url, "nodeId");
+      await deleteNode(sandboxPath, nodeId);
+      sendJson(response, 200, { ok: true });
+      return;
+    }
+
+    if (method === "POST" && url.pathname === "/api/node/duplicate") {
+      const nodeId = requireParam(url, "nodeId");
+      sendJson(response, 200, await duplicateNode(sandboxPath, nodeId));
       return;
     }
 
