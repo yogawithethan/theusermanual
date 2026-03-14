@@ -1,16 +1,22 @@
 const state = {
   selectedNodeId: null,
+  sandbox: null,
   nodes: [],
+  theme: null,
+  scene: null,
 };
 
 const elements = {
   status: document.querySelector("#status-pill"),
   columns: document.querySelector("#columns"),
-  preview: document.querySelector("#preview"),
   metadataForm: document.querySelector("#metadata-form"),
   inspectorTitle: document.querySelector("#inspector-title"),
   contentForm: document.querySelector("#content-form"),
   contentEditor: document.querySelector("#content-editor"),
+  themeForm: document.querySelector("#theme-form"),
+  themeEditor: document.querySelector("#theme-editor"),
+  sceneForm: document.querySelector("#scene-form"),
+  sceneEditor: document.querySelector("#scene-editor"),
 };
 
 async function api(path, options) {
@@ -24,6 +30,51 @@ async function api(path, options) {
 
 function selectedNode() {
   return state.nodes.find((node) => node.id === state.selectedNodeId) || null;
+}
+
+function buildColumns() {
+  if (!state.sandbox) {
+    return [];
+  }
+
+  const nodesById = new Map(state.nodes.map((node) => [node.id, node]));
+  const columns = [];
+  let parentId = "root";
+  let selectedId = state.selectedNodeId;
+
+  while (true) {
+    const childrenIds = parentId === "root" ? state.sandbox.rootChildren : nodesById.get(parentId)?.children || [];
+    if (childrenIds.length === 0) {
+      break;
+    }
+
+    const nodes = childrenIds.map((childId) => nodesById.get(childId)).filter(Boolean);
+    const type = nodes[0]?.type;
+    if (!type) {
+      break;
+    }
+
+    columns.push({
+      parentId,
+      label: state.sandbox.layerLabels[type] || type,
+      selectedNodeId: selectedId,
+      nodes,
+    });
+
+    if (!selectedId) {
+      break;
+    }
+
+    const selectedNode = nodesById.get(selectedId);
+    if (!selectedNode || selectedNode.type === "content") {
+      break;
+    }
+
+    parentId = selectedId;
+    selectedId = selectedNode.children[0] || null;
+  }
+
+  return columns;
 }
 
 function renderColumns(columns) {
@@ -69,8 +120,9 @@ function renderMetadata(node) {
   elements.metadataForm.description.value = node.description || "";
 }
 
-function renderPreview(previewContext) {
-  elements.preview.textContent = JSON.stringify(previewContext, null, 2);
+function renderConfigEditors() {
+  elements.themeEditor.value = state.theme ? JSON.stringify(state.theme, null, 2) : "";
+  elements.sceneEditor.value = state.scene ? JSON.stringify(state.scene, null, 2) : "";
 }
 
 async function refreshContentEditor() {
@@ -86,36 +138,33 @@ async function refreshContentEditor() {
 }
 
 async function refresh() {
-  const [sandboxPayload, columnsPayload] = await Promise.all([
-    api("/api/sandbox"),
-    state.selectedNodeId ? api(`/api/columns?selectedNodeId=${encodeURIComponent(state.selectedNodeId)}`) : Promise.resolve([]),
+  const sandboxPayload = await api("/api/sandbox");
+  const [nodes, theme, scene] = await Promise.all([
+    api("/api/nodes"),
+    api("/api/theme"),
+    api("/api/scene"),
   ]);
 
-  state.nodes = sandboxPayload.nodes;
+  state.sandbox = sandboxPayload.sandbox;
+  state.nodes = nodes;
+  state.theme = theme;
+  state.scene = scene;
+
   if (!state.selectedNodeId && state.nodes.length > 0) {
-    state.selectedNodeId = sandboxPayload.sandbox.rootChildren[0] || state.nodes[0].id;
+    state.selectedNodeId = state.sandbox.rootChildren[0] || state.nodes[0].id;
   }
 
-  const columns = state.selectedNodeId
-    ? await api(`/api/columns?selectedNodeId=${encodeURIComponent(state.selectedNodeId)}`)
-    : columnsPayload;
-  renderColumns(columns);
+  renderColumns(buildColumns());
 
   const node = selectedNode();
   renderMetadata(node);
+  renderConfigEditors();
   await refreshContentEditor();
-
-  if (node) {
-    const preview = await api(`/api/preview?nodeId=${encodeURIComponent(node.id)}`);
-    renderPreview(preview);
-  } else {
-    elements.preview.textContent = "Select a node to load preview context.";
-  }
 }
 
 async function init() {
-  const status = await api("/api/status");
-  elements.status.textContent = `${status.appName} • ${status.sandboxPath.split("/").pop()}`;
+  const sandboxPayload = await api("/api/sandbox");
+  elements.status.textContent = `${sandboxPayload.appName} • ${sandboxPayload.sandboxPath.split("/").pop()}`;
   await refresh();
 }
 
@@ -151,7 +200,27 @@ elements.contentForm.addEventListener("submit", async (event) => {
   await refresh();
 });
 
+elements.themeForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await api("/api/theme", {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: elements.themeEditor.value,
+  });
+  await refresh();
+});
+
+elements.sceneForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await api("/api/scene", {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: elements.sceneEditor.value,
+  });
+  await refresh();
+});
+
 init().catch((error) => {
   elements.status.textContent = error.message;
-  elements.preview.textContent = error.stack || error.message;
+  elements.themeEditor.value = error.stack || error.message;
 });

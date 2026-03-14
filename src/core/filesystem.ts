@@ -64,7 +64,17 @@ export async function renamePath(oldPath: string, newPath: string): Promise<void
 export async function listNodeIds(sandboxPath: string): Promise<string[]> {
   const nodesPath = path.join(resolveSandboxPath(sandboxPath), "nodes");
   const entries = await readdir(nodesPath, { withFileTypes: true });
-  return entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
+  const ids: string[] = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) {
+      continue;
+    }
+    const candidateId = entry.name;
+    if (await pathExists(nodeJsonPath(sandboxPath, candidateId))) {
+      ids.push(candidateId);
+    }
+  }
+  return ids.sort();
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

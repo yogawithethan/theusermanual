@@ -12,6 +12,7 @@
         <div>
           <div class="eyebrow">Local Editor</div>
           <h1>Islands • Sandbox</h1>
+          <p class="subcopy">Separate from the public User Manual site. This shell edits local sandbox files through the shared core engine.</p>
         </div>
         <div class="status-pill" id="status-pill">Connecting...</div>
       </header>
@@ -21,7 +22,7 @@
           <div class="panel-head">
             <div>
               <div class="eyebrow">Hierarchy</div>
-              <h2>Editor Columns</h2>
+              <h2>Node Browser</h2>
             </div>
           </div>
           <div id="columns" class="columns"></div>
@@ -55,7 +56,7 @@
           <div class="panel-head">
             <div>
               <div class="eyebrow">Content</div>
-              <h2>Leaf Editor</h2>
+              <h2>Markdown Editor</h2>
             </div>
           </div>
           <form id="content-form" class="stack">
@@ -67,11 +68,24 @@
         <section class="panel">
           <div class="panel-head">
             <div>
-              <div class="eyebrow">Preview</div>
-              <h2>Selected Node</h2>
+              <div class="eyebrow">Theme / Scene</div>
+              <h2>Local Config</h2>
             </div>
           </div>
-          <div id="preview" class="preview-frame">Select a node to load preview context.</div>
+          <form id="theme-form" class="stack tight">
+            <label class="field">
+              <span>Theme JSON</span>
+              <textarea id="theme-editor" rows="9"></textarea>
+            </label>
+            <button class="button secondary" type="submit">Save Theme</button>
+          </form>
+          <form id="scene-form" class="stack tight">
+            <label class="field">
+              <span>Scene JSON</span>
+              <textarea id="scene-editor" rows="9"></textarea>
+            </label>
+            <button class="button secondary" type="submit">Save Scene</button>
+          </form>
         </section>
       </main>
     </div>

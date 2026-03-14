@@ -4,9 +4,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  buildEditorColumns,
-  buildPreviewContext,
-  createNode,
   listNodes,
   readContent,
   readNode,
@@ -24,6 +21,7 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "../..");
 const sandboxPath = path.resolve(process.env.SANDBOX_PATH ?? path.join(repoRoot, "sandboxes/example-sandbox"));
 const port = Number(process.env.PORT ?? 4321);
+const host = "127.0.0.1";
 
 const staticFiles = new Map<string, { file: string; contentType: string }>([
   ["/", { file: path.join(__dirname, "index.html"), contentType: "text/html; charset=utf-8" }],
@@ -71,34 +69,27 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    if (method === "GET" && url.pathname === "/api/status") {
+    if (method === "GET" && url.pathname === "/api/sandbox") {
       sendJson(response, 200, {
         appName: "Islands • Sandbox",
         sandboxPath,
+        sandbox: await readSandbox(sandboxPath),
       });
       return;
     }
 
-    if (method === "GET" && url.pathname === "/api/sandbox") {
-      const [sandbox, nodes, theme, scene] = await Promise.all([
-        readSandbox(sandboxPath),
-        listNodes(sandboxPath),
-        readTheme(sandboxPath),
-        readScene(sandboxPath),
-      ]);
-      sendJson(response, 200, { sandbox, nodes, theme, scene });
+    if (method === "GET" && url.pathname === "/api/nodes") {
+      sendJson(response, 200, await listNodes(sandboxPath));
       return;
     }
 
-    if (method === "GET" && url.pathname === "/api/columns") {
-      const selectedNodeId = requireParam(url, "selectedNodeId");
-      sendJson(response, 200, await buildEditorColumns(sandboxPath, selectedNodeId));
+    if (method === "GET" && url.pathname === "/api/theme") {
+      sendJson(response, 200, await readTheme(sandboxPath));
       return;
     }
 
-    if (method === "GET" && url.pathname === "/api/preview") {
-      const nodeId = requireParam(url, "nodeId");
-      sendJson(response, 200, await buildPreviewContext(sandboxPath, nodeId));
+    if (method === "GET" && url.pathname === "/api/scene") {
+      sendJson(response, 200, await readScene(sandboxPath));
       return;
     }
 
@@ -111,11 +102,6 @@ const server = createServer(async (request, response) => {
     if (method === "GET" && url.pathname === "/api/node") {
       const nodeId = requireParam(url, "nodeId");
       sendJson(response, 200, await readNode(sandboxPath, nodeId));
-      return;
-    }
-
-    if (method === "POST" && url.pathname === "/api/nodes") {
-      sendJson(response, 201, await createNode(sandboxPath, (await readBody(request)) as never));
       return;
     }
 
@@ -149,7 +135,7 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, () => {
-  console.log(`Islands • Sandbox running at http://localhost:${port}`);
+server.listen(port, host, () => {
+  console.log(`Islands • Sandbox running at http://${host}:${port}`);
   console.log(`Editing sandbox: ${sandboxPath}`);
 });
