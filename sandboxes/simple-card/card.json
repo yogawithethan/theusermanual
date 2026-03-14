@@ -1,0 +1,16 @@
+{
+  "id": "card-001",
+  "title": "Breathe Deeper",
+  "description": "A calm place to begin. Shape the card visually, keep the file underneath, and stay completely out of JSON.",
+  "icon": "sparkles",
+  "style": {
+    "backgroundColor": "#F4EDE2",
+    "borderColor": "#1D1D1D",
+    "borderWidth": 2,
+    "radius": 30,
+    "titleColor": "#171717",
+    "descriptionColor": "#5E5A56",
+    "titleSize": 46
+  },
+  "updatedAt": "2026-03-14T00:00:00.000Z"
+}

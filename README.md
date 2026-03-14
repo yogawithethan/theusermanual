@@ -17,7 +17,7 @@ There are two different products here:
 What now exists for `Islands • Sandbox`:
 - a shared engine under `src/core/`
 - a sample sandbox under `sandboxes/example-sandbox/`
-- a separate local visual editor scaffold under `apps/sandbox/`
+- a separate local editor under `apps/sandbox/`
 
 Important: `Islands • Sandbox` is now a separate local editor scaffold in the repo, but it is still not a packaged desktop app like Electron or Tauri.
 
@@ -40,7 +40,7 @@ npm install
 npm run check
 ```
 
-To run the local `Islands • Sandbox` editor scaffold:
+To run the local `Islands • Sandbox` editor:
 
 ```bash
 npm install
@@ -57,9 +57,10 @@ PORT=4322 npm run sandbox
 
 ## Structure
 
-- `apps/sandbox/`: local `Islands • Sandbox` editor scaffold
+- `apps/sandbox/`: local `Islands • Sandbox` editor
 - `src/core/`: first-pass core for `Islands • Sandbox`
 - `sandboxes/example-sandbox/`: flat-registry sample sandbox used by `Islands • Sandbox`
+- `sandboxes/simple-card/`: minimal file-backed card used by the current editor
 - `island/`: portable island package
 - `island/schema/`: content model and structural rules
 - `island/island.json`: island-level metadata and expression references
@@ -74,12 +75,12 @@ The sandbox scaffold uses:
 - `/nodes/<nodeId>/node.json` for metadata
 - `/content/<nodeId>.md` for leaf content files
 
-The local editor scaffold in `apps/sandbox/` is a lightweight local web shell backed by a small Node server that imports `src/core/`. It is intentionally separate from the public site.
+The local editor in `apps/sandbox/` is a lightweight local web shell backed by a small Node server. It is intentionally separate from the public site.
 
-The current sandbox UI is aimed at a no-code direction:
-- visual hierarchy columns instead of file lists
-- a central canvas for the selected card or page
-- a no-code properties panel for text, icon, template, theme, and scene controls
-- no raw JSON in the normal editing flow
+The current pass is intentionally much smaller:
+- one centered editable card
+- one contextual controls panel
+- one Save action
+- no raw JSON in the visible experience
 
-It is still not a packaged desktop app yet. Packaging, folder-picker support, and publish flows are follow-up work.
+The editor currently saves to `sandboxes/simple-card/card.json`. It is still not a packaged desktop app yet. Packaging, folder-picker support, and larger relational editing flows are follow-up work.

@@ -3,28 +3,48 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import {
-  buildEditorColumns,
-  buildPreviewContext,
-  createNode,
-  deleteNode,
-  duplicateNode,
-  getNodeActionAvailability,
-  listNodes,
-  readSandbox,
-  readScene,
-  readTheme,
-  updateContent,
-  updateNode,
-  updateScene,
-  updateTheme,
-} from "../../src/core/index.js";
-import type { PreviewDevice } from "../../src/core/index.js";
+import { pathExists, readJsonFile, writeJsonFile } from "../../src/core/filesystem.js";
+
+interface EditableCardStyle {
+  backgroundColor: string;
+  borderColor: string;
+  borderWidth: number;
+  radius: number;
+  titleColor: string;
+  descriptionColor: string;
+  titleSize: number;
+}
+
+interface EditableCard {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  style: EditableCardStyle;
+  updatedAt: string;
+}
+
+const DEFAULT_CARD: EditableCard = {
+  id: "card-001",
+  title: "Breathe Deeper",
+  description: "A calm place to begin. Shape the card visually, keep the file underneath, and stay completely out of JSON.",
+  icon: "sparkles",
+  style: {
+    backgroundColor: "#F4EDE2",
+    borderColor: "#1D1D1D",
+    borderWidth: 2,
+    radius: 30,
+    titleColor: "#171717",
+    descriptionColor: "#5E5A56",
+    titleSize: 46,
+  },
+  updatedAt: "2026-03-14T00:00:00.000Z",
+};
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "../..");
-const sandboxPath = path.resolve(process.env.SANDBOX_PATH ?? path.join(repoRoot, "sandboxes/example-sandbox"));
+const cardPath = path.resolve(process.env.CARD_PATH ?? path.join(repoRoot, "sandboxes/simple-card/card.json"));
 const port = Number(process.env.PORT ?? 4321);
 const host = "127.0.0.1";
 
@@ -41,8 +61,7 @@ function sendJson(response: ServerResponse<IncomingMessage>, statusCode: number,
 
 function sendError(response: ServerResponse<IncomingMessage>, error: unknown): void {
   const message = error instanceof Error ? error.message : "Unknown error";
-  const statusCode = error instanceof Error ? 400 : 500;
-  sendJson(response, statusCode, { error: message });
+  sendJson(response, 400, { error: message });
 }
 
 async function readBody(request: IncomingMessage): Promise<unknown> {
@@ -54,60 +73,65 @@ async function readBody(request: IncomingMessage): Promise<unknown> {
   return raw ? JSON.parse(raw) : {};
 }
 
-function requireParam(url: URL, key: string): string {
-  const value = url.searchParams.get(key);
-  if (!value) {
-    throw new Error(`Missing required query parameter: ${key}`);
+function sanitizeColor(value: unknown, fallback: string): string {
+  if (typeof value !== "string") {
+    return fallback;
   }
-  return value;
+  const normalized = value.trim();
+  return /^#[0-9a-f]{6}$/i.test(normalized) ? normalized : fallback;
 }
 
-function normalizeDevice(value: string | null): PreviewDevice | undefined {
-  if (value === "desktop" || value === "tablet" || value === "mobile") {
-    return value;
+function sanitizeNumber(value: unknown, fallback: number, min: number, max: number): number {
+  const next = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(next)) {
+    return fallback;
   }
-  return undefined;
+  return Math.max(min, Math.min(max, next));
 }
 
-async function resolveSelectedNodeId(requestedNodeId?: string | null): Promise<string> {
-  const sandbox = await readSandbox(sandboxPath);
-  const nodes = await listNodes(sandboxPath);
-  const knownIds = new Set([sandbox.rootNodeId, ...nodes.map((node) => node.id)]);
-
-  if (requestedNodeId && knownIds.has(requestedNodeId)) {
-    return requestedNodeId;
-  }
-
-  return sandbox.rootChildren[0] ?? sandbox.rootNodeId;
+function sanitizeText(value: unknown, fallback: string): string {
+  return typeof value === "string" ? value.trim() : fallback;
 }
 
-async function readEditorState(requestUrl: URL): Promise<unknown> {
-  const selectedNodeId = await resolveSelectedNodeId(requestUrl.searchParams.get("selectedNodeId"));
-  const device = normalizeDevice(requestUrl.searchParams.get("device"));
+function sanitizeIcon(value: unknown): string {
+  return typeof value === "string" && value.trim() ? value.trim() : "sparkles";
+}
 
-  const [sandbox, nodes, theme, scene, columns, actions, preview] = await Promise.all([
-    readSandbox(sandboxPath),
-    listNodes(sandboxPath),
-    readTheme(sandboxPath),
-    readScene(sandboxPath),
-    buildEditorColumns(sandboxPath, selectedNodeId),
-    getNodeActionAvailability(sandboxPath, selectedNodeId),
-    buildPreviewContext(sandboxPath, selectedNodeId, device),
-  ]);
-
+function normalizeCard(input: Partial<EditableCard>, current: EditableCard): EditableCard {
   return {
-    appName: "Islands • Sandbox",
-    sandboxPath,
-    selectedNodeId,
-    sandbox,
-    nodes,
-    theme,
-    scene,
-    columns,
-    actions,
-    preview,
-    content: preview.content,
+    id: current.id,
+    title: sanitizeText(input.title, current.title) || current.title,
+    description: sanitizeText(input.description, current.description),
+    icon: sanitizeIcon(input.icon),
+    style: {
+      backgroundColor: sanitizeColor(input.style?.backgroundColor, current.style.backgroundColor),
+      borderColor: sanitizeColor(input.style?.borderColor, current.style.borderColor),
+      borderWidth: sanitizeNumber(input.style?.borderWidth, current.style.borderWidth, 0, 12),
+      radius: sanitizeNumber(input.style?.radius, current.style.radius, 0, 80),
+      titleColor: sanitizeColor(input.style?.titleColor, current.style.titleColor),
+      descriptionColor: sanitizeColor(input.style?.descriptionColor, current.style.descriptionColor),
+      titleSize: sanitizeNumber(input.style?.titleSize, current.style.titleSize, 20, 72),
+    },
+    updatedAt: new Date().toISOString(),
   };
+}
+
+async function ensureCardFile(): Promise<void> {
+  if (!(await pathExists(cardPath))) {
+    await writeJsonFile(cardPath, DEFAULT_CARD);
+  }
+}
+
+async function readCard(): Promise<EditableCard> {
+  await ensureCardFile();
+  return readJsonFile<EditableCard>(cardPath);
+}
+
+async function saveCard(input: Partial<EditableCard>): Promise<EditableCard> {
+  const current = await readCard();
+  const next = normalizeCard(input, current);
+  await writeJsonFile(cardPath, next);
+  return next;
 }
 
 const server = createServer(async (request, response) => {
@@ -123,50 +147,21 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    if (method === "GET" && url.pathname === "/api/editor-state") {
-      sendJson(response, 200, await readEditorState(url));
+    if (method === "GET" && url.pathname === "/api/card") {
+      sendJson(response, 200, {
+        appName: "Islands • Sandbox",
+        cardPath,
+        card: await readCard(),
+      });
       return;
     }
 
-    if (method === "POST" && url.pathname === "/api/node") {
-      sendJson(response, 200, await createNode(sandboxPath, (await readBody(request)) as never));
-      return;
-    }
-
-    if (method === "PATCH" && url.pathname === "/api/node") {
-      const nodeId = requireParam(url, "nodeId");
-      sendJson(response, 200, await updateNode(sandboxPath, nodeId, (await readBody(request)) as never));
-      return;
-    }
-
-    if (method === "DELETE" && url.pathname === "/api/node") {
-      const nodeId = requireParam(url, "nodeId");
-      await deleteNode(sandboxPath, nodeId);
-      sendJson(response, 200, { ok: true });
-      return;
-    }
-
-    if (method === "POST" && url.pathname === "/api/node/duplicate") {
-      const nodeId = requireParam(url, "nodeId");
-      sendJson(response, 200, await duplicateNode(sandboxPath, nodeId));
-      return;
-    }
-
-    if (method === "PUT" && url.pathname === "/api/content") {
-      const nodeId = requireParam(url, "nodeId");
-      const body = (await readBody(request)) as { content?: string };
-      await updateContent(sandboxPath, nodeId, body.content ?? "");
-      sendJson(response, 200, { ok: true });
-      return;
-    }
-
-    if (method === "PATCH" && url.pathname === "/api/theme") {
-      sendJson(response, 200, await updateTheme(sandboxPath, (await readBody(request)) as never));
-      return;
-    }
-
-    if (method === "PATCH" && url.pathname === "/api/scene") {
-      sendJson(response, 200, await updateScene(sandboxPath, (await readBody(request)) as never));
+    if (method === "PUT" && url.pathname === "/api/card") {
+      sendJson(response, 200, {
+        appName: "Islands • Sandbox",
+        cardPath,
+        card: await saveCard((await readBody(request)) as Partial<EditableCard>),
+      });
       return;
     }
 
@@ -176,7 +171,8 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, host, () => {
+server.listen(port, host, async () => {
+  await ensureCardFile();
   console.log(`Islands • Sandbox running at http://${host}:${port}`);
-  console.log(`Editing sandbox: ${sandboxPath}`);
+  console.log(`Editing card: ${cardPath}`);
 });
