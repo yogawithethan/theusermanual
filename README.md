@@ -14,7 +14,12 @@ There are two different products here:
 - `Islands • Sandbox`
   This is the local editing product we are building for your desktop workflow. Its job is to open sandbox folders, create/edit files, and eventually drive changes that can be published to the live website.
 
-Important: `Islands • Sandbox` is not yet a separate local UI application in this repo. What exists today is the first-pass core architecture for it under `src/core/` plus an example sandbox under `sandboxes/example-sandbox/`.
+What now exists for `Islands • Sandbox`:
+- a shared engine under `src/core/`
+- a sample sandbox under `sandboxes/example-sandbox/`
+- a separate local editor scaffold under `apps/sandbox/`
+
+Important: `Islands • Sandbox` is now a separate local editor scaffold in the repo, but it is still not a packaged desktop app like Electron or Tauri.
 
 ## Run
 
@@ -35,8 +40,18 @@ npm install
 npm run check
 ```
 
+To run the local `Islands • Sandbox` editor scaffold:
+
+```bash
+npm install
+npm run sandbox
+```
+
+Then open `http://localhost:4321`.
+
 ## Structure
 
+- `apps/sandbox/`: local `Islands • Sandbox` editor scaffold
 - `src/core/`: first-pass core for `Islands • Sandbox`
 - `sandboxes/example-sandbox/`: flat-registry sample sandbox used by `Islands • Sandbox`
 - `island/`: portable island package
@@ -52,3 +67,5 @@ The sandbox scaffold uses:
 - a virtual `root` identifier stored in `sandbox.json`
 - `/nodes/<nodeId>/node.json` for metadata
 - `/content/<nodeId>.md` for leaf content files
+
+The local editor scaffold in `apps/sandbox/` is a lightweight local web shell backed by a small Node server that imports `src/core/`. It is intentionally separate from the public site.

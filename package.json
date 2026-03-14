@@ -5,10 +5,12 @@
   "type": "module",
   "description": "Core services for Islands • Sandbox",
   "scripts": {
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "sandbox": "tsx apps/sandbox/server.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "tsx": "^4.20.5",
     "typescript": "^5.8.0"
   }
 }

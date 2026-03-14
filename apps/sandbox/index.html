@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Islands • Sandbox</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Local Editor</div>
+          <h1>Islands • Sandbox</h1>
+        </div>
+        <div class="status-pill" id="status-pill">Connecting...</div>
+      </header>
+
+      <main class="layout">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">Hierarchy</div>
+              <h2>Editor Columns</h2>
+            </div>
+          </div>
+          <div id="columns" class="columns"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">Inspector</div>
+              <h2 id="inspector-title">Select a node</h2>
+            </div>
+          </div>
+          <form id="metadata-form" class="stack">
+            <label class="field">
+              <span>Title</span>
+              <input name="title" type="text" />
+            </label>
+            <label class="field">
+              <span>Slug</span>
+              <input name="slug" type="text" />
+            </label>
+            <label class="field">
+              <span>Description</span>
+              <textarea name="description" rows="3"></textarea>
+            </label>
+            <button class="button" type="submit">Save Metadata</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">Content</div>
+              <h2>Leaf Editor</h2>
+            </div>
+          </div>
+          <form id="content-form" class="stack">
+            <textarea id="content-editor" rows="16" placeholder="Select a content node to edit markdown."></textarea>
+            <button class="button" type="submit">Save Content</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">Preview</div>
+              <h2>Selected Node</h2>
+            </div>
+          </div>
+          <div id="preview" class="preview-frame">Select a node to load preview context.</div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
