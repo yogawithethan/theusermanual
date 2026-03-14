@@ -10,7 +10,7 @@
   "sceneRef": "default",
   "icon": null,
   "description": "Leaf content page used for preview and editing.",
-  "contentFile": "content.md",
+  "contentFile": "node-content-001.md",
   "createdAt": "2026-03-14T00:00:00.000Z",
   "updatedAt": "2026-03-14T00:00:00.000Z"
 }

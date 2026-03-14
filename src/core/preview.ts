@@ -33,7 +33,7 @@ export async function getNodeActionAvailability(
 
   return {
     nodeId,
-    canEdit: true,
+    canEdit: node.type !== "root",
     canDelete: node.type !== "root" && node.children.length === 0,
     canDuplicate: node.type !== "root",
     canPreview: node.type === "content",
@@ -69,7 +69,8 @@ export async function buildEditorColumns(
       continue;
     }
 
-    const inferredType = children[0]?.type ?? (config.allowedChildTypes[parent.type] as NodeType[])[0];
+    const parentType = parent.type === "root" ? "root" : parent.type;
+    const inferredType = children[0]?.type ?? (config.allowedChildTypes[parentType] as NodeType[])[0];
     columns.push({
       parentId: parent.id,
       label: getLayerLabel(config, inferredType),

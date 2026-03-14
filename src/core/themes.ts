@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { readJsonFile, resolveSandboxPath, writeJsonFile } from "./filesystem.js";
+import { mergePlainObjects, readJsonFile, resolveSandboxPath, writeJsonFile } from "./filesystem.js";
 import type { ThemeConfig, UpdateThemeInput } from "./types.js";
 
 function themePath(sandboxPath: string): string {
@@ -17,30 +17,7 @@ export async function updateTheme(
   _themeId?: string,
 ): Promise<ThemeConfig> {
   const current = await readTheme(sandboxPath);
-  const next: ThemeConfig = {
-    ...current,
-    ...patch,
-    fonts: {
-      ...current.fonts,
-      ...(patch.fonts ?? {}),
-    },
-    colors: {
-      ...current.colors,
-      ...(patch.colors ?? {}),
-    },
-    card: {
-      ...current.card,
-      ...(patch.card ?? {}),
-      shadow: {
-        ...current.card.shadow,
-        ...(patch.card?.shadow ?? {}),
-      },
-    },
-    effects: {
-      ...current.effects,
-      ...(patch.effects ?? {}),
-    },
-  };
+  const next = mergePlainObjects(current, patch);
   await writeJsonFile(themePath(sandboxPath), next);
   return next;
 }

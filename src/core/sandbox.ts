@@ -19,6 +19,7 @@ export async function updateSandboxConfig(
   const next: SandboxConfig = {
     ...current,
     ...patch,
+    rootChildren: patch.rootChildren ?? current.rootChildren,
     layerLabels: {
       ...current.layerLabels,
       ...(patch.layerLabels ?? {}),
@@ -31,6 +32,16 @@ export async function updateSandboxConfig(
       ...current.defaultTemplates,
       ...(patch.defaultTemplates ?? {}),
     },
+  };
+  await writeJsonFile(sandboxConfigPath(sandboxPath), next);
+  return next;
+}
+
+export async function replaceRootChildren(sandboxPath: string, rootChildren: string[]): Promise<SandboxConfig> {
+  const current = await readSandbox(sandboxPath);
+  const next: SandboxConfig = {
+    ...current,
+    rootChildren: [...rootChildren],
   };
   await writeJsonFile(sandboxConfigPath(sandboxPath), next);
   return next;

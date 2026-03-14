@@ -65,6 +65,7 @@ export interface SandboxConfig {
   id: string;
   title: string;
   rootNodeId: string;
+  rootChildren: string[];
   layerLabels: Record<NodeType, string>;
   allowedChildTypes: Record<ParentType, NodeType[]>;
   defaultTemplates: Record<NodeType, TemplateName>;

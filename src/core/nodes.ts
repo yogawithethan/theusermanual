@@ -13,7 +13,7 @@ import {
   writeJsonFile,
   writeTextFile,
 } from "./filesystem.js";
-import { readSandbox } from "./sandbox.js";
+import { readSandbox, replaceRootChildren } from "./sandbox.js";
 import type {
   CreateNodeInput,
   DuplicateNodeInput,
@@ -43,6 +43,26 @@ function nowIso(): string {
 
 function isRootNode(node: StoredNodeMeta): node is RootNodeMeta {
   return node.type === "root";
+}
+
+function buildVirtualRoot(rootId: string, rootChildren: string[], themeRef: string, sceneRef: string): RootNodeMeta {
+  const timestamp = nowIso();
+  return {
+    id: rootId,
+    type: "root",
+    title: "Root",
+    slug: "root",
+    parentId: null,
+    children: [...rootChildren],
+    template: null,
+    themeRef,
+    sceneRef,
+    icon: null,
+    description: "Virtual sandbox root",
+    contentFile: null,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
 }
 
 function toParentType(node: StoredNodeMeta): "root" | NodeType {
@@ -97,6 +117,10 @@ function makeCopySlug(
 
 async function writeNodeMeta(sandboxPath: string, node: StoredNodeMeta): Promise<void> {
   assertContentNodeRules(node);
+  if (node.type === "root") {
+    await replaceRootChildren(sandboxPath, node.children);
+    return;
+  }
   await writeJsonFile(nodeJsonPath(sandboxPath, node.id), node);
 }
 
@@ -118,11 +142,21 @@ export async function listNodes(sandboxPath: string): Promise<StoredNodeMeta[]> 
 }
 
 export async function readNodeIndex(sandboxPath: string): Promise<Map<string, StoredNodeMeta>> {
+  const config = await readSandbox(sandboxPath);
   const nodes = await listNodes(sandboxPath);
-  return new Map(nodes.map((node) => [node.id, node]));
+  const nodesById = new Map(nodes.map((node) => [node.id, node]));
+  nodesById.set(
+    config.rootNodeId,
+    buildVirtualRoot(config.rootNodeId, config.rootChildren, config.defaultTheme, config.defaultScene),
+  );
+  return nodesById;
 }
 
 export async function readNode(sandboxPath: string, nodeId: string): Promise<StoredNodeMeta> {
+  if (nodeId === "root") {
+    const config = await readSandbox(sandboxPath);
+    return buildVirtualRoot(config.rootNodeId, config.rootChildren, config.defaultTheme, config.defaultScene);
+  }
   return readJsonFile<StoredNodeMeta>(nodeJsonPath(sandboxPath, nodeId));
 }
 
@@ -151,7 +185,7 @@ export async function createNode(sandboxPath: string, input: CreateNodeInput): P
     sceneRef: input.sceneRef ?? config.defaultScene,
     icon: input.icon ?? null,
     description: input.description ?? null,
-    contentFile: input.type === "content" ? input.contentFile ?? "content.md" : null,
+    contentFile: input.type === "content" ? input.contentFile ?? `${nodeId}.md` : null,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -176,6 +210,9 @@ export async function updateNode(
   nodeId: string,
   patch: UpdateNodeInput,
 ): Promise<NodeMeta> {
+  if ("parentId" in (patch as Record<string, unknown>) || "children" in (patch as Record<string, unknown>)) {
+    throw new Error("updateNode cannot modify parentId or children; use moveNode or reorderChildren");
+  }
   const nodesById = await readNodeIndex(sandboxPath);
   const node = assertNodeExists(nodesById, nodeId);
   assertEditableNode(node);
@@ -211,6 +248,9 @@ export async function deleteNode(sandboxPath: string, nodeId: string): Promise<v
     await updateStoredNode(sandboxPath, nodesById, nextParent);
   }
 
+  if (node.contentFile) {
+    await rm(nodeContentPath(sandboxPath, node.id, node.contentFile), { recursive: false, force: false });
+  }
   await rm(nodeDir(sandboxPath, node.id), { recursive: true, force: false });
 }
 
@@ -303,7 +343,6 @@ async function cloneSubtree(
     sceneRef: sourceNode.sceneRef,
     icon: sourceNode.icon,
     description: sourceNode.description,
-    contentFile: sourceNode.contentFile,
   });
 
   nodesById.set(copy.id, copy);

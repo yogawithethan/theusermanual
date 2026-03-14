@@ -2,6 +2,9 @@
   "id": "example-sandbox",
   "title": "Example Sandbox",
   "rootNodeId": "root",
+  "rootChildren": [
+    "node-layer1-001"
+  ],
   "layerLabels": {
     "layer1": "expressions",
     "layer2": "brands",

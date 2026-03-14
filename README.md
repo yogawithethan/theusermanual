@@ -33,3 +33,8 @@ npm run check
 - `app/`: renderer implementation only
 
 The new sandbox core is folder-agnostic and separate from the current User Manual renderer. It is designed around stable internal node types, sandbox label mappings, filesystem-backed editing, and editor-ready helpers for future UI work.
+
+The sandbox scaffold uses:
+- a virtual `root` identifier stored in `sandbox.json`
+- `/nodes/<nodeId>/node.json` for metadata
+- `/content/<nodeId>.md` for leaf content files
